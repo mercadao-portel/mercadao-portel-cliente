@@ -1,0 +1,714 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mercadão Portel</title>
+  <meta name="theme-color" content="#0f3f8c" />
+  <link rel="manifest" href="manifest.json" />
+  <style>
+    :root{
+      --bg:#eef3f8;
+      --panel:#ffffff;
+      --line:#dbe5f0;
+      --primary:#0f3f8c;
+      --primary-2:#1b63d1;
+      --dark:#14243b;
+      --muted:#6b7b93;
+      --ok:#16a34a;
+      --whats:#25D366;
+      --pix:#0d9488;
+      --shadow:0 10px 26px rgba(16,34,66,.08);
+      --radius:20px;
+    }
+    *{box-sizing:border-box}
+    html,body{margin:0;padding:0;font-family:Arial,Helvetica,sans-serif;background:linear-gradient(180deg,#f7f9fc 0,#eef3f8 100%);color:var(--dark)}
+    body{min-height:100vh}
+    .header{
+      background:linear-gradient(135deg,#0f3f8c,#1b63d1);color:#fff;padding:22px 18px 28px;position:sticky;top:0;z-index:20;
+      box-shadow:0 10px 20px rgba(11,30,61,.15)
+    }
+    .header-inner{max-width:1180px;margin:0 auto;display:flex;align-items:flex-start;justify-content:space-between;gap:14px;flex-wrap:wrap}
+    .brand h1{margin:0;font-size:32px;line-height:1.05}
+    .brand p{margin:8px 0 0;opacity:.92;max-width:680px;line-height:1.5}
+    .install-tip{background:rgba(255,255,255,.14);padding:10px 14px;border-radius:999px;border:1px solid rgba(255,255,255,.2);font-size:13px}
+    .container{max-width:1180px;margin:0 auto;padding:18px}
+    .toolbar,.panel,.product-card,.checkout-card,.summary-card,.pix-card{
+      background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow)
+    }
+    .toolbar{padding:16px;display:grid;grid-template-columns:1.25fr .75fr auto;gap:12px;align-items:end}
+    .field{display:flex;flex-direction:column;gap:6px}
+    .field label{font-size:13px;color:var(--muted);font-weight:700}
+    .field input,.field select,.field textarea{
+      width:100%;padding:13px 14px;border:1px solid #cdd8e4;border-radius:14px;background:#fff;font-size:15px;outline:none
+    }
+    .field input:focus,.field select:focus,.field textarea:focus{border-color:var(--primary-2);box-shadow:0 0 0 4px rgba(27,99,209,.12)}
+    .actions{display:flex;gap:10px;flex-wrap:wrap}
+    button{
+      border:none;border-radius:14px;padding:12px 16px;font-size:14px;font-weight:700;cursor:pointer;transition:.18s ease;
+      box-shadow:0 4px 12px rgba(0,0,0,.06)
+    }
+    button:hover{transform:translateY(-1px)}
+    .btn-primary{background:linear-gradient(135deg,var(--primary),var(--primary-2));color:#fff}
+    .btn-add{background:#eaf8ef;color:var(--ok)}
+    .btn-pix{background:#def7f5;color:#0f766e}
+    .btn-dark{background:#1e293b;color:#fff}
+    .btn-light{background:#edf4ff;color:var(--primary)}
+    .btn-whats{background:#e7fbef;color:#128c4a}
+    .layout{display:grid;grid-template-columns:1.1fr .9fr;gap:18px;margin-top:18px}
+    .section-head{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:12px}
+    .section-head h2,.section-head h3{margin:0;font-size:24px}
+    .section-head p{margin:4px 0 0;color:var(--muted)}
+    .chips{display:flex;gap:8px;flex-wrap:wrap}
+    .chip{
+      padding:9px 14px;border-radius:999px;border:1px solid var(--line);background:#fff;color:var(--primary);font-weight:700;font-size:13px;cursor:pointer
+    }
+    .chip.active{background:#edf4ff;border-color:#bfd6ff}
+    .catalog-panel{padding:16px}
+    .products-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+    .product-card{padding:16px;background:#fbfdff}
+    .product-card h4{margin:0 0 8px;font-size:19px}
+    .meta{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px}
+    .pill{display:inline-flex;padding:5px 10px;border-radius:999px;font-size:12px;font-weight:700}
+    .pill.cat{background:#edf4ff;color:var(--primary)}
+    .pill.price{background:#eefbf3;color:#0e9f6e}
+    .product-card p{margin:0;color:var(--muted);line-height:1.5;min-height:40px}
+    .qty-row{display:flex;align-items:center;gap:10px;margin-top:14px}
+    .qty-box{
+      display:flex;align-items:center;gap:8px;background:#fff;border:1px solid #dbe5f0;border-radius:14px;padding:6px
+    }
+    .qty-box button{padding:8px 12px;border-radius:10px;background:#edf4ff;color:var(--primary);box-shadow:none}
+    .qty-box input{width:58px;text-align:center;border:none;outline:none;font-size:15px;background:transparent}
+    .checkout-card{padding:16px;position:sticky;top:110px}
+    .summary-card{padding:16px;background:#fbfdff;margin-bottom:14px}
+    .summary-top{display:flex;align-items:center;justify-content:space-between;gap:10px}
+    .summary-total{font-size:30px;font-weight:800}
+    .cart-list{list-style:none;padding:0;margin:14px 0 0;display:grid;gap:10px}
+    .cart-list li{
+      border:1px solid #e5edf6;border-radius:14px;padding:12px;background:#fff;display:flex;align-items:flex-start;justify-content:space-between;gap:12px
+    }
+    .cart-list small{display:block;color:var(--muted);margin-top:4px}
+    .remove-btn{background:#ffe7e7;color:#b91c1c;box-shadow:none;padding:8px 10px;border-radius:10px}
+    .pix-card{
+      margin-top:14px;padding:16px;background:#fbfffe;border-color:#d7f3ef
+    }
+    .pix-card h4{margin:0 0 8px;font-size:22px}
+    .pix-code{background:#fff;border:1px solid #dfe8f2;border-radius:14px;padding:12px;word-break:break-word;font-size:14px;line-height:1.5}
+    .pix-card img{width:220px;max-width:100%;display:block;margin:16px auto 0;background:#fff;border:1px solid #dfe8f2;border-radius:16px;padding:10px}
+    .empty{
+      border:1px dashed #cfd8e3;border-radius:18px;padding:24px;text-align:center;color:var(--muted);background:#fbfdff
+    }
+    .sticky-bar{
+      position:fixed;left:16px;right:16px;bottom:16px;background:linear-gradient(135deg,#0f3f8c,#1b63d1);color:#fff;
+      border-radius:18px;box-shadow:0 14px 30px rgba(14,34,67,.24);padding:14px 16px;display:flex;justify-content:space-between;gap:10px;align-items:center;z-index:30
+    }
+    .sticky-bar.hidden{display:none}
+    .sticky-total{font-size:24px;font-weight:800}
+    .toast{
+      position:fixed;right:18px;bottom:96px;z-index:99;background:#16263f;color:#fff;padding:14px 16px;border-radius:16px;
+      box-shadow:var(--shadow);opacity:0;transform:translateY(10px);pointer-events:none;transition:.25s ease
+    }
+    .toast.show{opacity:1;transform:translateY(0)}
+    .footer-space{height:90px}
+    @media(max-width:1050px){
+      .layout{grid-template-columns:1fr}
+      .checkout-card{position:static}
+      .toolbar{grid-template-columns:1fr}
+    }
+    @media(max-width:760px){
+      .brand h1{font-size:27px}
+      .products-grid{grid-template-columns:1fr}
+      .summary-total{font-size:26px}
+      .sticky-total{font-size:22px}
+    }
+  </style>
+</head>
+<body>
+  <div id="toast" class="toast"></div>
+
+  <header class="header">
+    <div class="header-inner">
+      <div class="brand">
+        <h1>Mercadão Portel</h1>
+        <p>Faça seu pedido pelo celular com uma experiência mais bonita, rápida e pronta para instalar como aplicativo.</p>
+      </div>
+      <div class="install-tip">Abra no navegador e instale como app na tela inicial.</div>
+    </div>
+  </header>
+
+  <main class="container">
+    <section class="toolbar">
+      <div class="field">
+        <label for="buscaProduto">Buscar produto</label>
+        <input type="text" id="buscaProduto" placeholder="Digite o nome do produto..." oninput="renderCatalogo()" />
+      </div>
+      <div class="field">
+        <label for="filtroCategoria">Categoria</label>
+        <select id="filtroCategoria" onchange="renderCatalogo()">
+          <option value="">Todas as categorias</option>
+        </select>
+      </div>
+      <div class="actions">
+        <button class="btn-light" onclick="limparFiltros()">Limpar filtro</button>
+      </div>
+    </section>
+
+    <div class="layout">
+      <section class="catalog-panel panel">
+        <div class="section-head">
+          <div>
+            <h2>Catálogo de produtos</h2>
+            <p>Escolha os itens, ajuste a quantidade e adicione ao carrinho.</p>
+          </div>
+          <div class="chips" id="chipsCategorias"></div>
+        </div>
+
+        <div id="produtosLoja" class="products-grid"></div>
+        <div id="estadoVazioProdutos" class="empty hidden">Nenhum produto encontrado para este filtro.</div>
+      </section>
+
+      <aside class="checkout-card">
+        <div class="summary-card">
+          <div class="summary-top">
+            <div>
+              <div style="font-size:13px;color:var(--muted);font-weight:700">Resumo do carrinho</div>
+              <div class="summary-total" id="totalCarrinho">R$ 0,00</div>
+            </div>
+            <span class="pill cat" id="contadorItens">0 item(ns)</span>
+          </div>
+          <ul id="carrinhoLista" class="cart-list"></ul>
+          <div id="estadoVazioCarrinho" class="empty" style="margin-top:14px;">Seu carrinho está vazio.</div>
+        </div>
+
+        <div class="panel" style="padding:16px;">
+          <div class="section-head" style="margin-bottom:10px;">
+            <div>
+              <h3>Finalizar pedido</h3>
+              <p>Preencha seus dados e escolha a entrega.</p>
+            </div>
+          </div>
+
+          <div class="field">
+            <label for="nomeCliente">Nome</label>
+            <input type="text" id="nomeCliente" placeholder="Seu nome" />
+          </div>
+          <div class="field">
+            <label for="telefoneCliente">Telefone</label>
+            <input type="text" id="telefoneCliente" placeholder="Seu telefone" />
+          </div>
+          <div class="field">
+            <label for="entrega">Forma de entrega</label>
+            <select id="entrega" onchange="mostrarCamposEntrega()">
+              <option value="">Selecione</option>
+              <option value="moto">Moto</option>
+              <option value="entregador">Entregador</option>
+              <option value="retirada">Retirada</option>
+              <option value="barco">Barco</option>
+            </select>
+          </div>
+
+          <div id="nomeBarcoDiv" class="field hidden">
+            <label for="nomeBarco">Nome do barco</label>
+            <input type="text" id="nomeBarco" placeholder="Digite o nome do barco" />
+          </div>
+
+          <div id="nomeVilaDiv" class="field hidden">
+            <label for="nomeVila">Nome da vila</label>
+            <input type="text" id="nomeVila" placeholder="Digite o nome da vila" />
+          </div>
+
+          <div class="actions" style="margin-top:6px;">
+            <button class="btn-pix" onclick="gerarPix()">Gerar PIX</button>
+            <button class="btn-primary" onclick="enviarPedidoEComprovante()">Enviar pedido</button>
+          </div>
+
+          <div id="pixArea" class="pix-card hidden"></div>
+        </div>
+      </aside>
+    </div>
+
+    <div class="footer-space"></div>
+  </main>
+
+  <div id="stickyBar" class="sticky-bar hidden">
+    <div>
+      <div style="font-size:12px;opacity:.82">Carrinho</div>
+      <div class="sticky-total" id="stickyTotal">R$ 0,00</div>
+    </div>
+    <button class="btn-whats" onclick="document.querySelector('.checkout-card').scrollIntoView({behavior:'smooth'})">Finalizar pedido</button>
+  </div>
+
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyADEkaUZHX93hdLBL_bQfQcJV_iHWHFxgg",
+      authDomain: "meu-e-commerce-e4f70.firebaseapp.com",
+      projectId: "meu-e-commerce-e4f70",
+      storageBucket: "meu-e-commerce-e4f70.firebasestorage.app",
+      messagingSenderId: "674482543537",
+      appId: "1:674482543537:web:a09acd35107bde4b74fb90"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+
+    let carrinho = [];
+    let produtosGlobal = [];
+    let lojaConfig = {};
+    let categoriaChipAtiva = "";
+
+    function toast(msg){
+      const el = document.getElementById('toast');
+      el.textContent = msg;
+      el.classList.add('show');
+      clearTimeout(window.__toastTimer);
+      window.__toastTimer = setTimeout(() => el.classList.remove('show'), 2500);
+    }
+
+    function formatarReais(valor){
+      return Number(valor || 0).toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
+    }
+
+    function limparTextoPix(texto, limite){
+      return (texto || "")
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .replace(/[^a-zA-Z0-9 ]/g, "")
+        .trim()
+        .toUpperCase()
+        .substring(0, limite);
+    }
+
+    function formatarCampoPix(id, valor){
+      const tamanho = String(valor.length).padStart(2, "0");
+      return id + tamanho + valor;
+    }
+
+    function crc16CCITT(str){
+      let crc = 0xFFFF;
+      for(let i=0;i<str.length;i++){
+        crc ^= str.charCodeAt(i) << 8;
+        for(let j=0;j<8;j++){
+          if((crc & 0x8000) !== 0){
+            crc = (crc << 1) ^ 0x1021;
+          }else{
+            crc = crc << 1;
+          }
+          crc &= 0xFFFF;
+        }
+      }
+      return crc.toString(16).toUpperCase().padStart(4, "0");
+    }
+
+    function parecePayloadPixValido(valor){
+      if(!valor) return false;
+      const texto = valor.trim().toUpperCase();
+      return texto.startsWith("000201") && texto.includes("BR.GOV.BCB.PIX");
+    }
+
+    function gerarPayloadPix(obj){
+      const chaveLimpa = (obj.chave || "").trim();
+      const nomeLimpo = limparTextoPix(obj.nome, 25);
+      const cidadeLimpa = limparTextoPix(obj.cidade, 15);
+      const descricaoLimpa = limparTextoPix(obj.descricao, 30);
+
+      if(!chaveLimpa || !nomeLimpo || !cidadeLimpa) return "";
+
+      let contaPix = "";
+      contaPix += formatarCampoPix("00", "BR.GOV.BCB.PIX");
+      contaPix += formatarCampoPix("01", chaveLimpa);
+      if(descricaoLimpa){
+        contaPix += formatarCampoPix("02", descricaoLimpa);
+      }
+
+      let payload = "";
+      payload += formatarCampoPix("00", "01");
+      payload += formatarCampoPix("26", contaPix);
+      payload += formatarCampoPix("52", "0000");
+      payload += formatarCampoPix("53", "986");
+      if(obj.valor && Number(obj.valor) > 0){
+        payload += formatarCampoPix("54", Number(obj.valor).toFixed(2));
+      }
+      payload += formatarCampoPix("58", "BR");
+      payload += formatarCampoPix("59", nomeLimpo);
+      payload += formatarCampoPix("60", cidadeLimpa);
+      payload += formatarCampoPix("62", formatarCampoPix("05", "***"));
+      const base = payload + "6304";
+      return base + crc16CCITT(base);
+    }
+
+    function obterDadosPix(total){
+      const payloadPronto =
+        lojaConfig.pixPayload ||
+        lojaConfig.payloadPix ||
+        lojaConfig.pixCopiaCola ||
+        lojaConfig.copiaColaPix ||
+        "";
+
+      if(parecePayloadPixValido(payloadPronto)){
+        return { tipo:"payload", texto:payloadPronto.trim(), motivo:"" };
+      }
+
+      const chavePix = lojaConfig.pixChave || lojaConfig.chavePix || lojaConfig.pix || "";
+      const nomePix = lojaConfig.pixNome || lojaConfig.nomePix || lojaConfig.nomeRecebedor || "";
+      const cidadePix = lojaConfig.pixCidade || lojaConfig.cidadePix || lojaConfig.cidadeRecebedor || "";
+      const descricaoPix = lojaConfig.pixDescricao || lojaConfig.descricaoPix || "MERCADAO PORTEL";
+
+      if(chavePix){
+        if(!nomePix || !cidadePix){
+          return {
+            tipo:"somente-chave",
+            texto:chavePix.trim(),
+            motivo:"Configure também pixNome e pixCidade no Firebase em config/main para gerar QR Code válido."
+          };
+        }
+        const payloadGerado = gerarPayloadPix({
+          chave: chavePix,
+          nome: nomePix,
+          cidade: cidadePix,
+          valor: total,
+          descricao: descricaoPix
+        });
+        if(payloadGerado && parecePayloadPixValido(payloadGerado)){
+          return { tipo:"payload", texto:payloadGerado, motivo:"" };
+        }
+        return {
+          tipo:"somente-chave",
+          texto:chavePix.trim(),
+          motivo:"Não foi possível montar o payload PIX corretamente."
+        };
+      }
+
+      return {
+        tipo:"nenhum",
+        texto:"",
+        motivo:"Configure pixPayload ou pixChave + pixNome + pixCidade no Firebase em config/main."
+      };
+    }
+
+    db.collection("produtos").onSnapshot(snapshot => {
+      produtosGlobal = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }))
+        .filter(p => p.ativo !== false);
+      popularCategorias();
+      renderCatalogo();
+    });
+
+    db.collection("config").doc("main").onSnapshot(doc => {
+      if(doc.exists){
+        lojaConfig = doc.data();
+      }
+    });
+
+    function popularCategorias(){
+      const categorias = [...new Set(produtosGlobal.map(p => p.categoria).filter(Boolean))].sort((a,b) => a.localeCompare(b,'pt-BR'));
+      const select = document.getElementById("filtroCategoria");
+      select.innerHTML = '<option value="">Todas as categorias</option>' + categorias.map(c => `<option value="${c}">${c}</option>`).join("");
+
+      const chips = document.getElementById("chipsCategorias");
+      chips.innerHTML = `<button class="chip ${categoriaChipAtiva === '' ? 'active' : ''}" onclick="selecionarChip('')">Tudo</button>` +
+        categorias.map(c => `<button class="chip ${categoriaChipAtiva === c ? 'active' : ''}" onclick="selecionarChip(${JSON.stringify(c)})">${c}</button>`).join("");
+    }
+
+    function selecionarChip(categoria){
+      categoriaChipAtiva = categoria;
+      document.getElementById("filtroCategoria").value = categoria;
+      popularCategorias();
+      renderCatalogo();
+    }
+
+    function limparFiltros(){
+      document.getElementById("buscaProduto").value = "";
+      document.getElementById("filtroCategoria").value = "";
+      categoriaChipAtiva = "";
+      popularCategorias();
+      renderCatalogo();
+    }
+
+    function renderCatalogo(){
+      const div = document.getElementById("produtosLoja");
+      const vazio = document.getElementById("estadoVazioProdutos");
+      const busca = document.getElementById("buscaProduto").value.trim().toLowerCase();
+      const categoria = document.getElementById("filtroCategoria").value;
+
+      const lista = produtosGlobal.filter(p => {
+        const atendeBusca =
+          !busca ||
+          (p.nome || "").toLowerCase().includes(busca) ||
+          (p.categoria || "").toLowerCase().includes(busca) ||
+          (p.descricao || "").toLowerCase().includes(busca);
+        const atendeCategoria = !categoria || p.categoria === categoria;
+        return atendeBusca && atendeCategoria;
+      }).sort((a,b) => (a.nome || "").localeCompare(b.nome || "", 'pt-BR'));
+
+      div.innerHTML = "";
+      vazio.classList.toggle("hidden", lista.length > 0);
+
+      lista.forEach(p => {
+        const card = document.createElement("div");
+        card.className = "product-card";
+        const qtdAtual = obterQuantidadeTemp(p.id);
+        card.innerHTML = `
+          <div class="meta">
+            <span class="pill cat">${p.categoria || "Sem categoria"}</span>
+            <span class="pill price">${formatarReais(p.preco)}</span>
+          </div>
+          <h4>${p.nome}</h4>
+          <p>${p.descricao || "Produto disponível para pedido no Mercadão Portel."}</p>
+          <div class="qty-row">
+            <div class="qty-box">
+              <button onclick="alterarQtdTemp('${p.id}', -1)">-</button>
+              <input type="number" min="1" value="${qtdAtual}" id="qtd_${p.id}" />
+              <button onclick="alterarQtdTemp('${p.id}', 1)">+</button>
+            </div>
+            <button class="btn-add" style="flex:1" onclick="adicionarAoCarrinho('${p.id}')">Adicionar ao carrinho</button>
+          </div>
+        `;
+        div.appendChild(card);
+      });
+    }
+
+    function obterQuantidadeTemp(id){
+      const input = document.getElementById("qtd_" + id);
+      if(input) return Math.max(1, parseInt(input.value || "1",10));
+      return 1;
+    }
+
+    function alterarQtdTemp(id, delta){
+      const input = document.getElementById("qtd_" + id);
+      if(!input) return;
+      let valor = parseInt(input.value || "1", 10);
+      if(isNaN(valor) || valor < 1) valor = 1;
+      valor += delta;
+      if(valor < 1) valor = 1;
+      input.value = valor;
+    }
+
+    function adicionarAoCarrinho(id){
+      const produto = produtosGlobal.find(p => p.id === id);
+      const qtd = parseInt(document.getElementById("qtd_" + id).value, 10);
+      if(!produto || qtd < 1 || isNaN(qtd)){
+        toast("Quantidade inválida.");
+        return;
+      }
+
+      const existente = carrinho.find(item => item.id === id);
+      if(existente){
+        existente.quantidade += qtd;
+      }else{
+        carrinho.push({ ...produto, quantidade: qtd });
+      }
+      document.getElementById("qtd_" + id).value = 1;
+      atualizarCarrinho();
+      toast("Produto adicionado ao carrinho.");
+    }
+
+    function removerDoCarrinho(id){
+      carrinho = carrinho.filter(item => item.id !== id);
+      atualizarCarrinho();
+      toast("Item removido do carrinho.");
+    }
+
+    function alterarQtdCarrinho(id, delta){
+      const item = carrinho.find(p => p.id === id);
+      if(!item) return;
+      item.quantidade += delta;
+      if(item.quantidade <= 0){
+        removerDoCarrinho(id);
+        return;
+      }
+      atualizarCarrinho();
+    }
+
+    function calcularTotalCarrinho(){
+      return carrinho.reduce((total, item) => total + Number(item.preco) * Number(item.quantidade), 0);
+    }
+
+    function atualizarCarrinho(){
+      const ul = document.getElementById("carrinhoLista");
+      const vazio = document.getElementById("estadoVazioCarrinho");
+      const stickyBar = document.getElementById("stickyBar");
+      ul.innerHTML = "";
+
+      carrinho.forEach(item => {
+        const subtotal = Number(item.preco) * Number(item.quantidade);
+        const li = document.createElement("li");
+        li.innerHTML = `
+          <div style="flex:1;">
+            <strong>${item.nome}</strong>
+            <small>${item.categoria || "Sem categoria"} · ${item.quantidade} unidade(s)</small>
+            <small>${formatarReais(subtotal)}</small>
+            <div class="actions" style="margin-top:8px;">
+              <button class="btn-light" style="padding:8px 12px" onclick="alterarQtdCarrinho('${item.id}', -1)">-</button>
+              <button class="btn-light" style="padding:8px 12px" onclick="alterarQtdCarrinho('${item.id}', 1)">+</button>
+            </div>
+          </div>
+          <button class="remove-btn" onclick="removerDoCarrinho('${item.id}')">Remover</button>
+        `;
+        ul.appendChild(li);
+      });
+
+      const total = calcularTotalCarrinho();
+      document.getElementById("totalCarrinho").textContent = formatarReais(total);
+      document.getElementById("stickyTotal").textContent = formatarReais(total);
+      document.getElementById("contadorItens").textContent = `${carrinho.reduce((s,i)=>s+i.quantidade,0)} item(ns)`;
+
+      vazio.classList.toggle("hidden", carrinho.length > 0);
+      stickyBar.classList.toggle("hidden", carrinho.length === 0);
+    }
+
+    function mostrarCamposEntrega(){
+      const entrega = document.getElementById("entrega").value;
+      const mostrar = entrega === "barco";
+      document.getElementById("nomeBarcoDiv").classList.toggle("hidden", !mostrar);
+      document.getElementById("nomeVilaDiv").classList.toggle("hidden", !mostrar);
+
+      if(!mostrar){
+        document.getElementById("nomeBarco").value = "";
+        document.getElementById("nomeVila").value = "";
+      }
+    }
+
+    function copiarPix(){
+      const el = document.getElementById("pixCodigo");
+      if(!el) return;
+      navigator.clipboard.writeText(el.textContent)
+        .then(() => toast("Código PIX copiado."))
+        .catch(() => toast("Não foi possível copiar automaticamente."));
+    }
+
+    function mostrarPix(total){
+      const pixArea = document.getElementById("pixArea");
+      const dadosPix = obterDadosPix(total);
+      pixArea.classList.remove("hidden");
+
+      if(dadosPix.tipo === "payload"){
+        const qrUrl = "https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=" + encodeURIComponent(dadosPix.texto);
+        pixArea.innerHTML = `
+          <h4>Pagamento via PIX</h4>
+          <p style="margin:0 0 8px;color:var(--muted)">Total do pedido: <strong>${formatarReais(total)}</strong></p>
+          <p style="margin:0 0 10px;color:var(--muted)">Escaneie o QR Code ou copie o código abaixo.</p>
+          <div class="pix-code" id="pixCodigo">${dadosPix.texto}</div>
+          <div class="actions" style="margin-top:12px;">
+            <button class="btn-dark" onclick="copiarPix()">Copiar código PIX</button>
+          </div>
+          <img src="${qrUrl}" alt="QR Code PIX" />
+        `;
+        return;
+      }
+
+      if(dadosPix.tipo === "somente-chave"){
+        pixArea.innerHTML = `
+          <h4>PIX configurado parcialmente</h4>
+          <p style="margin:0 0 10px;color:var(--muted)"><strong>QR Code não foi gerado</strong> para evitar pagamento errado.</p>
+          <p style="margin:0 0 10px;color:var(--muted)">${dadosPix.motivo}</p>
+          <div class="pix-code" id="pixCodigo">${dadosPix.texto}</div>
+          <div class="actions" style="margin-top:12px;">
+            <button class="btn-dark" onclick="copiarPix()">Copiar chave PIX</button>
+          </div>
+        `;
+        return;
+      }
+
+      pixArea.innerHTML = `
+        <h4>PIX não configurado</h4>
+        <p style="margin:0;color:var(--muted)">${dadosPix.motivo}</p>
+      `;
+    }
+
+    function gerarPix(){
+      if(carrinho.length === 0){
+        toast("Adicione pelo menos um produto ao carrinho.");
+        return;
+      }
+      const total = calcularTotalCarrinho();
+      mostrarPix(total);
+      document.getElementById("pixArea").scrollIntoView({behavior:"smooth", block:"nearest"});
+    }
+
+    function enviarPedidoEComprovante(){
+      const nome = document.getElementById("nomeCliente").value.trim();
+      const telefone = document.getElementById("telefoneCliente").value.trim();
+      const entrega = document.getElementById("entrega").value;
+      const nomeBarco = document.getElementById("nomeBarco").value.trim();
+      const nomeVila = document.getElementById("nomeVila").value.trim();
+
+      if(!nome || !telefone || !entrega || carrinho.length === 0){
+        toast("Preencha nome, telefone, entrega e adicione produtos.");
+        return;
+      }
+      if(entrega === "barco" && !nomeBarco){
+        toast("Digite o nome do barco.");
+        return;
+      }
+      if(entrega === "barco" && !nomeVila){
+        toast("Digite o nome da vila.");
+        return;
+      }
+
+      let total = 0;
+      let linhasPedido = "";
+      carrinho.forEach(item => {
+        const subtotal = Number(item.preco || 0) * Number(item.quantidade || 0);
+        total += subtotal;
+        linhasPedido += `- ${item.nome} (${item.categoria || "Sem categoria"}) x ${item.quantidade} = ${formatarReais(subtotal)}\n`;
+      });
+
+      const pedidoData = {
+        nome,
+        telefone,
+        produtos: carrinho,
+        total,
+        entrega,
+        nomeBarco,
+        nomeVila,
+        status: "Aguardando pagamento",
+        timestamp: firebase.firestore.FieldValue.serverTimestamp()
+      };
+
+      let mensagem = `Pedido de ${nome} (+${telefone})\n\n`;
+      mensagem += `${linhasPedido}\n`;
+      mensagem += `Entrega: ${entrega}`;
+      if(entrega === "barco"){
+        mensagem += ` (Barco: ${nomeBarco} | Vila: ${nomeVila})`;
+      }
+      mensagem += `\nTotal: ${formatarReais(total)}\n\n`;
+      mensagem += `Já gerei o PIX no app. Após pagar, envio o comprovante nesta conversa.`;
+
+      const janelaWhats = window.open("", "_blank");
+
+      db.collection("pedidos").add(pedidoData).then(() => {
+        mostrarPix(total);
+        if(lojaConfig.whatsapp){
+          const urlWhats = `https://wa.me/${lojaConfig.whatsapp}?text=${encodeURIComponent(mensagem)}`;
+          if(janelaWhats){
+            janelaWhats.location = urlWhats;
+          }else{
+            window.open(urlWhats, "_blank");
+          }
+        }else{
+          if(janelaWhats) janelaWhats.close();
+          toast("WhatsApp não configurado no Firebase em config/main.");
+        }
+
+        toast("Pedido salvo com sucesso.");
+        carrinho = [];
+        atualizarCarrinho();
+      }).catch(error => {
+        console.error(error);
+        if(janelaWhats) janelaWhats.close();
+        toast("Erro ao salvar o pedido.");
+      });
+    }
+
+    atualizarCarrinho();
+
+    if('serviceWorker' in navigator){
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./service-worker.js').catch(console.error);
+      });
+    }
+  </script>
+</body>
+</html>
