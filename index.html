@@ -67,12 +67,15 @@
     .catalog-panel{padding:16px}
     .products-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
     .product-card{padding:16px;background:#fbfdff}
-    .product-card h4{margin:0 0 8px;font-size:19px}
+    .product-card h4{margin:0 0 8px;font-size:22px;font-weight:800;color:#0b3f91;line-height:1.25;letter-spacing:.1px}
     .meta{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px}
     .pill{display:inline-flex;padding:5px 10px;border-radius:999px;font-size:12px;font-weight:700}
     .pill.cat{background:#edf4ff;color:var(--primary)}
     .pill.price{background:#eefbf3;color:#0e9f6e}
     .product-card p{margin:0;color:var(--muted);line-height:1.5;min-height:40px}
+    .product-card .pill.cat{font-weight:800}
+    .product-card .pill.price{font-weight:800}
+    .product-card:hover{border-color:#c6d7ee;transform:translateY(-2px);transition:.18s ease}
     .qty-row{display:flex;align-items:center;gap:10px;margin-top:14px}
     .qty-box{
       display:flex;align-items:center;gap:8px;background:#fff;border:1px solid #dbe5f0;border-radius:14px;padding:6px
@@ -132,7 +135,7 @@
         <h1>Mercadão Portel</h1>
         <p>Faça seu pedido pelo celular com uma experiência mais bonita, rápida e pronta para instalar como aplicativo.</p>
       </div>
-      <div class="install-tip">Abra no navegador e instale como app na tela inicial.</div>
+      <div class="install-tip">Abra este link no Chrome ou Safari para instalar como app.</div>
     </div>
   </header>
 
@@ -536,7 +539,7 @@
         const li = document.createElement("li");
         li.innerHTML = `
           <div style="flex:1;">
-            <strong>${item.nome}</strong>
+            <strong style="font-size:17px;color:#0b3f91;line-height:1.2;display:block">${item.nome}</strong>
             <small>${item.categoria || "Sem categoria"} · ${item.quantidade} unidade(s)</small>
             <small>${formatarReais(subtotal)}</small>
             <div class="actions" style="margin-top:8px;">
@@ -681,7 +684,8 @@
       db.collection("pedidos").add(pedidoData).then(() => {
         mostrarPix(total);
         if(lojaConfig.whatsapp){
-          const urlWhats = `https://wa.me/${lojaConfig.whatsapp}?text=${encodeURIComponent(mensagem)}`;
+          const numeroWhats = String(lojaConfig.whatsapp).replace(/\D/g, "");
+          const urlWhats = `https://wa.me/${numeroWhats}?text=${encodeURIComponent(mensagem)}`;
           if(janelaWhats){
             janelaWhats.location = urlWhats;
           }else{
